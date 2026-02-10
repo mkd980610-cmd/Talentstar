@@ -519,7 +519,36 @@
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         }
-
+// 这是为你新增的导入功能
+function importDatabase() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = event => {
+            try {
+                const importedDb = JSON.parse(event.target.result);
+                // 简单的格式校验
+                if (importedDb.candidates && importedDb.companies) {
+                    if (confirm('导入将覆盖当前浏览器存储的所有数据，确定吗？')) {
+                        db = importedDb;
+                        saveData();
+                        alert('数据同步成功！页面即将刷新');
+                        location.reload();
+                    }
+                } else {
+                    alert('文件格式不正确，请确保上传的是从本系统导出的 JSON 备份。');
+                }
+            } catch (err) {
+                alert('解析文件失败，请检查文件是否损坏。');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
         function renderCompanies(container) {
             container.innerHTML = `<div class="page-header"><div class="page-title">公司管理</div><button class="btn" onclick="openCompanyForm()">+ 新增公司</button></div>
                 <div class="card"><table><thead><tr><th>公司名称</th><th>状态</th><th>备注</th></tr></thead><tbody id="list-comp"></tbody></table></div>`;
@@ -624,4 +653,5 @@
         }
     </script>
 </body>
+
 </html>
